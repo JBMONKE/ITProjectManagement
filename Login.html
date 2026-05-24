@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="view" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking System - Login</title>
+    <script>
+        function saveLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = username.includes('@') ? username : '';
+            const loginData = {
+                username,
+                email,
+                password
+            };
+            localStorage.setItem('flightLogin', JSON.stringify(loginData));
+            window.location.href = 'menu.html';
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 480px;
+            margin: 40px auto;
+            align-self : center;
+            align-items: center;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: #ffffff;
+        }
+
+        .login-header h1 {
+            margin: 0 0 8px 0;
+            color: #0055aa;
+        }
+
+        .formData { margin-bottom: 12px; }
+
+        .formData label { display:block; margin-bottom:6px; font-weight:600; }
+
+        .formData input { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px }
+
+        .login-button {
+            display:inline-block;
+            padding:10px 16px;
+            background:#0055aa;
+            color:#fff;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Flight Booker</h1>
+            <p>Sign in to manage flights, reservations, and tickets.</p>
+        </div>
+        <form action="menu.html" method="get" onsubmit="saveLogin(event)">
+            <div class="formData">
+                <label for="username">Email or Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your email or username" required>
+            </div>
+            <div class="formData">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button class="login-button" type="submit">Login</button>
+        </form>
+        <div class="login-footer">
+            <p>New user? <a href="">Create account</a></p>
+            <p>Forgot Password? <a href="">Forgot password?</a></p>
+        </div>
+    </div>
+</body>
+</html>

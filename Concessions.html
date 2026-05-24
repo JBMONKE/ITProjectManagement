@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="view" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - Add Concessions</title>
+    <script>
+        let currentReservation = null;
+        let concessionsCart = {
+            soda: 0,
+            chips: 0,
+            seatUpgrade: 0
+        };
+        let prices = {
+            soda: 3.50,
+            chips: 4.00,
+            seatUpgrade: 50.00
+        };
+
+        function loadReservation() {
+            const index = localStorage.getItem('currentReservationIndex');
+            const reservations = JSON.parse(localStorage.getItem('flightReservations') || '[]');
+            
+            if (index === null || index < 0 || index >= reservations.length) {
+                document.getElementById('reservationDetails').innerHTML = '<p>No reservation found. <a href="Reservations.html">Back to Reservations</a></p>';
+                return;
+            }
+            
+            currentReservation = reservations[index];
+            
+            // Display reservation details
+            const detailsDiv = document.getElementById('reservationDetails');
+            detailsDiv.innerHTML = `
+                <h2>${currentReservation.airline} - ${currentReservation.flightNumber}</h2>
+                <p><strong>Route:</strong> ${currentReservation.from} → ${currentReservation.to}</p>
+                <p><strong>Date:</strong> ${currentReservation.date || 'Not specified'}</p>
+                <p><strong>Passengers:</strong> ${currentReservation.passengers}</p>
+                <p><strong>Departure:</strong> ${currentReservation.departure} | <strong>Arrival:</strong> ${currentReservation.arrival}</p>
+            `;
+            
+            // Load existing concessions if any
+            loadConcessions(index);
+            updateCart();
+        }
+
+        function loadConcessions(index) {
+            const concessionsData = JSON.parse(localStorage.getItem('flightConcessions') || '{}');
+            if (concessionsData[index]) {
+                concessionsCart = concessionsData[index];
+                updateQuantities();
+            }
+        }
+
+        function updateQuantities() {
+            document.getElementById('sodaQty').value = concessionsCart.soda;
+            document.getElementById('chipsQty').value = concessionsCart.chips;
+            document.getElementById('seatUpgradeQty').value = concessionsCart.seatUpgrade;
+        }
+
+        function updateItemQuantity(item, quantity) {
+            concessionsCart[item] = Math.max(0, parseInt(quantity) || 0);
+            updateCart();
+        }
+
+        function updateCart() {
+            let total = 0;
+            let details = '<h3>Order Summary</h3>';
+            
+            if (concessionsCart.soda > 0) {
+                const sodaTotal = concessionsCart.soda * prices.soda;
+                total += sodaTotal;
+                details += `<p>Soda x${concessionsCart.soda}: $${sodaTotal.toFixed(2)}</p>`;
+            }
+            
+            if (concessionsCart.chips > 0) {
+                const chipsTotal = concessionsCart.chips * prices.chips;
+                total += chipsTotal;
+                details += `<p>Chips x${concessionsCart.chips}: $${chipsTotal.toFixed(2)}</p>`;
+            }
+            
+            if (concessionsCart.seatUpgrade > 0) {
+                const upgradeTotal = concessionsCart.seatUpgrade * prices.seatUpgrade;
+                total += upgradeTotal;
+                details += `<p>Seat Upgrade x${concessionsCart.seatUpgrade}: $${upgradeTotal.toFixed(2)}</p>`;
+            }
+            
+            if (total === 0) {
+                details += '<p>No items selected.</p>';
+            }
+            
+            details += `<h3 style="color: #0055aa; margin-top: 16px;">Concessions Total: $${total.toFixed(2)}</h3>`;
+            document.getElementById('cartSummary').innerHTML = details;
+        }
+
+        function saveConcessionsToReservation() {
+            const index = localStorage.getItem('currentReservationIndex');
+            const concessionsData = JSON.parse(localStorage.getItem('flightConcessions') || '{}');
+            
+            concessionsData[index] = concessionsCart;
+            localStorage.setItem('flightConcessions', JSON.stringify(concessionsData));
+            
+            alert('Concessions added successfully!');
+            window.location.href = 'Reservations.html';
+        }
+
+        function goBack() {
+            window.location.href = 'Reservations.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', loadReservation);
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+        }
+
+        .reservation-section {
+            flex: 1;
+        }
+
+        .concessions-section {
+            flex: 1;
+        }
+
+        #reservationDetails {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #reservationDetails h2 {
+            margin-top: 0;
+            color: #0055aa;
+        }
+
+        #reservationDetails p {
+            margin: 8px 0;
+        }
+
+        .concession-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .concession-item h3 {
+            margin-top: 0;
+            color: #0055aa;
+        }
+
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-input label {
+            font-weight: bold;
+        }
+
+        .quantity-input input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        #cartSummary {
+            background-color: #f0f8ff;
+            border: 2px solid #0055aa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #cartSummary h3 {
+            margin-top: 0;
+            color: #0055aa;
+        }
+
+        #cartSummary p {
+            margin: 8px 0;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .save-button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="menu.html">Book Flight</a>
+        <a href="profile.html">User Profile</a>
+        <a href="Reservations.html">My Reservations</a>
+    </div>
+
+    <div class="page-header">
+        <h1>Add Concessions</h1>
+        <p>Enhance your flight experience with snacks and seat upgrades.</p>
+    </div>
+
+    <div class="container">
+        <div id="reservationDetails"></div>
+
+        <div class="content-wrapper">
+            <div class="reservation-section">
+                <h2>Available Concessions</h2>
+
+                <div class="concession-item">
+                    <h3>🥤 Soda</h3>
+                    <div class="item-details">
+                        <div>
+                            <p>Refreshing beverage for your flight</p>
+                            <div class="price">$3.50 per item</div>
+                        </div>
+                        <div class="quantity-input">
+                            <label for="sodaQty">Quantity:</label>
+                            <input type="number" id="sodaQty" value="0" min="0" onchange="updateItemQuantity('soda', this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concession-item">
+                    <h3>🍟 Chips</h3>
+                    <div class="item-details">
+                        <div>
+                            <p>Crispy snacks to enjoy during your flight</p>
+                            <div class="price">$4.00 per item</div>
+                        </div>
+                        <div class="quantity-input">
+                            <label for="chipsQty">Quantity:</label>
+                            <input type="number" id="chipsQty" value="0" min="0" onchange="updateItemQuantity('chips', this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concession-item">
+                    <h3>✈️ Seat Upgrade</h3>
+                    <div class="item-details">
+                        <div>
+                            <p>Upgrade to premium seating for extra comfort</p>
+                            <div class="price">$50.00 per seat</div>
+                        </div>
+                        <div class="quantity-input">
+                            <label for="seatUpgradeQty">Quantity:</label>
+                            <input type="number" id="seatUpgradeQty" value="0" min="0" onchange="updateItemQuantity('seatUpgrade', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concessions-section">
+                <div id="cartSummary"></div>
+                <div class="button-container">
+                    <button class="save-button" onclick="saveConcessionsToReservation()">Save Concessions</button>
+                    <button class="back-button" onclick="goBack()">Back to Reservations</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

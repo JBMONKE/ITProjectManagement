@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="view" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - Profile</title>
+    <script>
+        function saveProfile(event) {
+            event.preventDefault();
+            const profile = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                notes: document.getElementById('notes').value.trim()
+            };
+            localStorage.setItem('flightProfile', JSON.stringify(profile));
+            renderProfile();
+            document.getElementById('fullName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('notes').value = '';
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = 'Profile saved successfully.';
+            setTimeout(() => statusMessage.textContent = '', 3000);
+        }
+
+        function renderProfile() {
+            const saved = localStorage.getItem('flightProfile');
+            const loginSaved = localStorage.getItem('flightLogin');
+            const loginData = loginSaved ? JSON.parse(loginSaved) : {};
+            const profile = saved ? JSON.parse(saved) : {};
+
+            const fullName = profile.fullName || loginData.displayName || 'Name';
+            const email = profile.email || loginData.email || 'email@email.com';
+            const phone = profile.phone || '(777) 777 7777';
+            const membership = profile.membership || 'Silver';
+            const notes = profile.notes || 'Add travel preferences or special notes';
+
+            document.getElementById('displayName').textContent = fullName;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('displayPhone').textContent = phone;
+            document.getElementById('displayMembership').textContent = membership;
+            document.getElementById('displayNotes').textContent = notes;
+
+            document.getElementById('fullName').value = profile.fullName || loginData.displayName || '';
+            document.getElementById('email').value = profile.email || loginData.email || '';
+            document.getElementById('phone').value = profile.phone || '';
+            document.getElementById('notes').value = profile.notes || '';
+        }
+
+        window.addEventListener('DOMContentLoaded', renderProfile);
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .profile-card,
+        .profile-form {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+        }
+
+        .profile-card h2,
+        .profile-form h2 {
+            margin-top: 0;
+            color: #0055aa;
+        }
+
+        .profile-detail {
+            display: grid;
+            gap: 12px;
+        }
+
+        .profile-detail div {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .profile-detail div:last-child {
+            border-bottom: none;
+        }
+
+        .profile-detail span:first-child {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .form-group textarea {
+            min-height: 110px;
+        }
+
+        .save-button {
+            background-color: #0055aa;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .save-button:hover {
+            background-color: #003f7d;
+        }
+
+        .status-text {
+            color: #007700;
+            margin-top: 12px;
+            min-height: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="menu.html">Book Flight</a>
+        <a href="Profile.html">User Profile</a>
+        <a href="reservations.html">My Reservations</a>
+    </div>
+
+    <div class="page-header">
+        <h1>Your Profile</h1>
+        <p>View and update the details we use for your bookings.</p>
+    </div>
+
+    <div class="profile-grid">
+        <section class="profile-card">
+            <h2>Profile Summary</h2>
+            <div class="profile-detail">
+                <div><span>Name</span><span id="displayName">Name</span></div>
+                <div><span>Email</span><span id="displayEmail">Email</span></div>
+                <div><span>Phone</span><span id="displayPhone">(777)-777-7777</span></div>
+                <div><span>Membership</span><span id="displayMembership">Silver</span></div>
+                <div><span>Notes</span><span id="displayNotes">No notes added yet.</span></div>
+            </div>
+        </section>
+
+        <section class="profile-form">
+            <h2>Edit Profile</h2>
+            <form onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Add travel preferences or special notes"></textarea>
+                </div>
+                <button type="submit" class="save-button">Save Profile</button>
+                <div id="statusMessage" class="status-text"></div>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

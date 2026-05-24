@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="view" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - Reservations</title>
+    <script>
+        function renderReservations() {
+            const reservations = JSON.parse(localStorage.getItem('flightReservations') || '[]');
+            const resultsDiv = document.getElementById('reservationsList');
+            if (reservations.length === 0) {
+                resultsDiv.innerHTML = '<p>No reservations yet. Book a flight from the menu first.</p>';
+                return;
+            }
+
+            let html = '<h2>My Reservations</h2>';
+            reservations.forEach((reservation, index) => {
+                html += `
+                    <div class="reservation-card">
+                        <h3>${reservation.airline} - ${reservation.flightNumber}</h3>
+                        <p><strong>Route:</strong> ${reservation.from} → ${reservation.to}</p>
+                        <p><strong>Date:</strong> ${reservation.date || 'Not specified'}</p>
+                        <p><strong>Passengers:</strong> ${reservation.passengers}</p>
+                        <p><strong>Departure:</strong> ${reservation.departure} | <strong>Arrival:</strong> ${reservation.arrival}</p>
+                        <p><strong>Total Price:</strong> $${reservation.totalPrice}</p>
+                        <div class="button-group">
+                            <button class="concessions-button" onclick="openConcessions(${index})">Add Concessions</button>
+                            <button class="cancel-button" onclick="cancelReservation(${index})">Cancel Reservation</button>
+                        </div>
+                    </div>
+                `;
+            });
+            resultsDiv.innerHTML = html;
+        }
+
+        function cancelReservation(index) {
+            const reservations = JSON.parse(localStorage.getItem('flightReservations') || '[]');
+            if (index < 0 || index >= reservations.length) return;
+            reservations.splice(index, 1);
+            localStorage.setItem('flightReservations', JSON.stringify(reservations));
+            renderReservations();
+        }
+
+        function openConcessions(index) {
+            localStorage.setItem('currentReservationIndex', index);
+            window.location.href = 'Concessions.html';
+        }
+
+        function clearReservations() {
+            localStorage.removeItem('flightReservations');
+            renderReservations();
+        }
+
+        window.addEventListener('DOMContentLoaded', renderReservations);
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .reservation-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+        }
+
+        .reservation-card h3 {
+            margin-top: 0;
+            color: #0055aa;
+        }
+
+        .reservation-card p {
+            margin: 8px 0;
+        }
+
+        .clear-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .clear-button:hover {
+            background-color: #c9302c;
+        }
+
+        .cancel-button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .cancel-button:hover {
+            background-color: #e04f4f;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .concessions-button {
+            background-color: #0055aa;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .concessions-button:hover {
+            background-color: #004488;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="menu.html">Book Flight</a>
+        <a href="profile.html">User Profile</a>
+        <a href="Reservations.html">My Reservations</a>
+    </div>
+
+    <div class="page-header">
+        <h1>My Reservations</h1>
+        <p>Review all flights you’ve booked.</p>
+    </div>
+
+    <button class="clear-button" onclick="clearReservations()">Clear All Reservations</button>
+    <div id="reservationsList"></div>
+</body>
+</html>

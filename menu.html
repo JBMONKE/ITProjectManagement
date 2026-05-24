@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="view" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - Search Flights</title>
+    
+    <script>
+        const flights = [
+            { flightNumber: 'AA101', airline: 'American Airlines', from: 'new york', to: 'los angeles', departure: '08:00', arrival: '11:30', price: 250 },
+            { flightNumber: 'UA202', airline: 'United Airlines', from: 'new york', to: 'chicago', departure: '09:00', arrival: '10:30', price: 150 },
+            { flightNumber: 'DL303', airline: 'Delta Airlines', from: 'los angeles', to: 'san francisco', departure: '12:00', arrival: '13:30', price: 100 },
+            { flightNumber: 'SW404', airline: 'Southwest Airlines', from: 'chicago', to: 'miami', departure: '14:00', arrival: '17:30', price: 200 },
+            { flightNumber: 'JB505', airline: 'JetBlue', from: 'miami', to: 'new york', departure: '18:00', arrival: '20:30', price: 180 },
+            { flightNumber: 'AA606', airline: 'American Airlines', from: 'san francisco', to: 'new york', departure: '07:00', arrival: '15:30', price: 350 }
+        ];
+
+        function selectTripType(button, type) {
+            document.querySelectorAll('.trip-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        function showFormError(message) {
+            const errorDiv = document.getElementById('formError');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function clearFormError() {
+            const errorDiv = document.getElementById('formError');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+            }
+        }
+
+        function bookFlight(flightNumber) {
+            const date = document.getElementById('date').value;
+            const passengers = document.getElementById('passengers').value;
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (!date || selectedDate <= today) {
+                showFormError('Please choose a travel date after today.');
+                return;
+            }
+            const flight = flights.find(f => f.flightNumber === flightNumber);
+
+            if (!flight) {
+                alert('Sorry, this flight could not be found.');
+                return;
+            }
+
+            const reservation = {
+                flightNumber: flight.flightNumber,
+                airline: flight.airline,
+                from: flight.from,
+                to: flight.to,
+                departure: flight.departure,
+                arrival: flight.arrival,
+                price: flight.price,
+                date,
+                passengers,
+                totalPrice: flight.price * parseInt(passengers, 10)
+            };
+
+            const existing = JSON.parse(localStorage.getItem('flightReservations') || '[]');
+            existing.push(reservation);
+            localStorage.setItem('flightReservations', JSON.stringify(existing));
+
+            window.location.href = 'Reservations.html';
+        }
+
+        function searchFlights(event) {
+            event.preventDefault();
+            clearFormError();
+            const from = document.getElementById('from').value.toLowerCase();
+            const to = document.getElementById('to').value.toLowerCase();
+            const date = document.getElementById('date').value;
+            const passengers = document.getElementById('passengers').value;
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (!date || selectedDate <= today) {
+                showFormError('Please choose a travel date after today.');
+                return;
+            }
+
+            const matchingFlights = flights.filter(flight => flight.from === from && flight.to === to);
+                // display results
+            const results = document.getElementById('results');
+            if (matchingFlights.length > 0) {
+                let AvailableFlights = '<h2>Available Flights</h2>';
+                matchingFlights.forEach(flight => {
+                    AvailableFlights += `
+                        <div class="flight-card">
+                            <h3>${flight.airline} - ${flight.flightNumber}</h3>
+                            <p>Departure: ${flight.departure} | Arrival: ${flight.arrival}</p>
+                            <p>Price: $${flight.price} per person</p>
+                            <button onclick="bookFlight('${flight.flightNumber}')">Book Now</button>
+                        </div>
+                    `;
+                });
+                results.innerHTML = AvailableFlights;
+            } else {
+                results.innerHTML = '<p>No flights found for the selected route.</p>';
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:  #ffffff;
+            padding: 20px;
+        }
+        /* Navbar colors and styling */
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+            align-items: end;
+            border: 2px solid #000000;
+            padding: 20px;
+            border-radius: 8px;
+        }
+ /* Form data styling */
+        .formData {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .formData label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .formData input,
+        .formData select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .error-message {
+            display: none;
+            color: #b00020;
+            background-color: #ffd7dd;
+            border: 1px solid #f5a3ac;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            grid-column: 1 / -1;
+        }
+
+        .formData input:focus,
+        .formData select:focus {
+            outline: none;
+            border-color: #0055aa;
+            box-shadow: 0 0 4px rgba(0, 85, 170, 0.3);
+        }
+
+        .search-button {
+            padding: 12px 30px;
+            background-color: #0055aa;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        .search-button:hover {
+            background-color: #000000;
+        }
+            /* flight  card styling */
+        .flight-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+
+        .flight-card h3 {
+            margin: 0 0 10px 0;
+            color: #0055aa;
+        }
+
+        .flight-card p {
+            margin: 5px 0;
+        }
+
+        .flight-card button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .flight-card button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="menu.html">Book Flight</a>
+        <a href="profile.html">User Profile</a>
+        <a href="reservations.html">My Reservations</a>
+
+    </div>
+
+    <div>
+    </br> </br>
+        <h1 align="center">Book Your Flight</h1>
+        <p align="center"> Find and book flights to destinations worldwide</p>
+    </br> </br> </br>
+    </div>
+        <!-- form layout and data input -->
+        <form class="search-form" onsubmit="searchFlights(event)">
+            <div id="formError" class="error-message" style="display: none;"></div>
+            <div class="formData">
+                <label>From</label>
+                <input type="text" id="from" name="from" placeholder="Departure city" required>
+            </div>
+
+            <div class="formData">
+                <label>To</label>
+                <input type="text" id="to" name="to" placeholder="Destination city" required>
+            </div>
+
+            <div class="formData">
+                <label>Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="formData">
+                <label>Passengers</label>
+                <select id="passengers" name="passengers" required>
+                    <option value="1">1 Passenger</option>
+                    <option value="2">2 Passengers</option>
+                    <option value="3">3 Passengers</option>
+                    <option value="4">4 Passengers</option>
+                    <option value="5">5 Passengers</option>
+                    <option value="6">6 Passengers</option>
+                </select>
+            </div>
+
+            <button type="submit" class="search-button">Search Flights</button>
+        </form>
+
+        <div id="results"></div>
+    </div>
+
+</body>
+</html>
